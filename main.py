@@ -68,59 +68,39 @@ def dashboard():
     if "previous_status" not in st.session_state:
         st.session_state.previous_status = st.session_state.entry_status.copy()
 
-    background_color = "red" if "unsecured" in st.session_state.entry_status.values() else "white"
-
     st.markdown(
-        f"""
+        """
         <style>
-            body {{ background-color: {background_color}; }}
-            .title {{
+            .title {
                 text-align: center;
                 font-size: 30px;
                 font-weight: bold;
                 margin-bottom: 20px;
-            }}
-            .stButton>button {{
+            }
+            .stButton>button {
                 background-color: black;
                 color: white;
                 border-radius: 8px;
-                padding: 6px 10px;
+                padding: 8px 15px;
                 font-size: 16px;
                 cursor: pointer;
-                width: 100px;
-                margin-top: 10px;
+                width: 180px;
+                text-align: center;
+                display: inline-block;
                 transition: background-color 0.3s, transform 0.3s;
-            }}
-            .stButton>button:hover {{
-                border: 1px solid black;
+                font-weight: bold;
+            }
+            .stButton>button:hover {
                 background-color: white;
                 color: black;
-                transform: scale(1.05);
-            }}
-            .account-info-btn {{
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                font-size: 16px;
-                padding: 8px 15px;
-                background: black;
-                color: white;
-                border-radius: 8px;
-                border: none;
-                cursor: pointer;
-                transition: 0.3s;
-            }}
-            .account-info-btn:hover {{
-                background: white;
-                color: black;
                 border: 1px solid black;
-            }}
+            }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-    # Account Info Button in the top-left corner
+    
     if st.button("Account Info", key="account_info", help="Click to view account details"):
         st.session_state["show_sidebar"] = not st.session_state.get("show_sidebar", False)
 
@@ -180,21 +160,23 @@ def dashboard():
                 )
 
             with col_button:
-                
-                if name == "Main Entrance Door" and st.session_state["role"] != "admin":
+                if name == "Side Window":
+                    
+                    if st.button("🔒 Secure", key=f"{name}_secure_button"):
+                        st.toast(f"⏳ {name} status is PENDING")
+                elif name == "Main Entrance Door" and st.session_state["role"] != "admin":
                     st.text("🔒 Restricted")
                 else:
-                    if status == "pending":
-                        if st.button("Secure", key=f"{name}_secure_button"):
-                            st.toast(f"⏳ {name} status is PENDING")
-                    else:
-                        button_label = 'Secure' if status == "unsecured" else 'Unsecure'
-                        if st.button(button_label, key=name):
-                            new_status = "unsecured" if status == "secured" else "secured"
-                            st.session_state.entry_status[name] = new_status
-                            toast_icon = "✔️" if new_status == "secured" else "⚠️"
-                            st.toast(f"{toast_icon} {name} is now {new_status.upper()}!")
-                            st.rerun()
+                    
+                    icon = "🔒" if status == "secured" else "🔓"
+                    button_label = f"{icon} {'Unsecure' if status == 'secured' else 'Secure'}"
+
+                    if st.button(button_label, key=name):
+                        new_status = "unsecured" if status == "secured" else "secured"
+                        st.session_state.entry_status[name] = new_status
+                        toast_icon = "✔️" if new_status == "secured" else "⚠️"
+                        st.toast(f"{toast_icon} {name} is now {new_status.upper()}!")
+                        st.rerun()
 
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
