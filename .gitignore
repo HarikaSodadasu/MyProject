@@ -19,6 +19,9 @@ dashboard
 # other
 .DS_Store
 
+# idea
+.idea
+
 # sphinx docs 
 _build
 _static

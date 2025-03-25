@@ -246,6 +246,46 @@
     </div>
   </div>
 
+<script>
+function filterTable() {
+    let table, tr, i, j, td, txtValue;
+    table = document.getElementById("analyticsTable");
+    tr = table.getElementsByTagName("tr");
+
+    // Get all search inputs
+    let inputs = document.querySelectorAll("thead input");
+
+    // Loop through all table rows (excluding header rows)
+    for (i = 2; i < tr.length; i++) {
+        let match = true; // Assume row is visible unless a column filter fails
+
+        // Check all columns
+        for (j = 0; j < inputs.length; j++) {
+            let filter = inputs[j].value.toLowerCase();
+            td = tr[i].getElementsByTagName("td")[j];
+
+            if (td && filter) { // Only apply filter if input is not empty
+                txtValue = td.textContent || td.innerText;
+                if (!txtValue.toLowerCase().includes(filter)) {
+                    match = false; // If one column doesn't match, hide row
+                    break;
+                }
+            }
+        }
+
+        // Show or hide row based on filter match
+        tr[i].style.display = match ? "" : "none";
+    }
+}
+
+// Attach event listeners to all input fields
+document.addEventListener("DOMContentLoaded", function () {
+    let inputs = document.querySelectorAll("thead input");
+    inputs.forEach(input => {
+        input.addEventListener("keyup", filterTable);
+    });
+});
+</script>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->

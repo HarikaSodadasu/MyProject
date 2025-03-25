@@ -162,7 +162,7 @@
                 <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
                     <div class="building-layout">
                         <div class="d-flex justify-content-center">
-                            <img src="/static/assets/img/BuildingImage.png" alt="Building Layout" class="img-fluid border-radius-lg" style="height: 400px; overflow-y: auto;">
+                            <img src="/static/assets/img/BuildingImage.png" alt="Building Layout" class="img-fluid border-radius-lg" style="height: 515px; overflow-y: auto;">
                         </div>
                     </div>
                 </div>
@@ -226,6 +226,43 @@
 
 
     </div>
+    <div class="row mt-4">
+    <div class="col-lg-6 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+              <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div class="crowd-analytics-layout">
+                      <div class="d-flex justify-content-center">
+                        <div id="density-heatmap" style="height: 400px; width: 100%;" class="border-radius-lg"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card-body">
+              <h6 class="mb-0">People Density</h6>
+                  <p class="mb-0 text-sm">updated 4 min ago</p>
+                  <p class="mb-0 text-sm">Total people counted: 65</p>
+              </div>
+          </div>
+      </div>
+    <div class="col-lg-6 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+              <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div class="building-layout">
+                      <div class="d-flex justify-content-center">
+                        <div id="flow-vector-field2" style="height: 400px; width: 100%;" class="border-radius-lg"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card-body">
+              <h6 class="mb-0">People Flow</h6>
+                  <p class="mb-0 text-sm">updated 4 min ago</p>
+              </div>
+          </div>
+      </div>
+    </div>
 </div>
 
 {% endblock content %}
@@ -233,7 +270,120 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script src="/static/assets/js/plugins/chartjs.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+{ // Heatmap
+    const x = Array.from({ length: 20 }, (_, i) => i * 0.5);
+    const y = Array.from({ length: 15 }, (_, j) => j * 0.5);
+    const z = y.map((_, j) => x.map(xi => Math.exp(-((xi-5)**2 + (j*0.5-4)**2)/4)));
+    
+    Plotly.newPlot('density-heatmap', [{
+        type: 'heatmap',
+        x, y, z,
+        colorscale: 'Viridis'
+    }], {
+        title: 'Density Heatmap',
+        margin: { l: 40, r: 40, t: 60, b: 40 }
+    });
+}
+</script>
+
+<script>
+{ // Vector Field
+    const pointsX = Array.from({ length: 5 }, (_, i) => i * 2);
+    const pointsY = Array.from({ length: 4 }, (_, j) => j * 2);
+    const traces = [];
+    
+    pointsX.forEach((xi, i) => {
+        pointsY.forEach((yj, j) => {
+            traces.push({
+                type: 'scatter',
+                mode: 'lines+markers',
+                x: [xi, xi + Math.sin(Math.PI * xi/10)],
+                y: [yj, yj + Math.cos(Math.PI * yj/8)],
+                line: { color: '#FF6D00', width: 2 }
+            });
+        });
+    });
+
+    Plotly.newPlot('flow-vector-field', traces, {
+        title: 'People Flow',
+        margin: { l: 40, r: 40, t: 60, b: 40 }
+    });
+}
+</script>
+
+<script>
+  {
+      // Define the grid
+      const gridSize = 5;
+      const x = Array.from({length: gridSize}, (_, i) => i);
+      const y = Array.from({length: gridSize}, (_, i) => i);
+  
+      // Define flow directions
+      const directions = ['N', 'S', 'E', 'W', 'NE', 'NW', 'SE', 'SW'];
+      const directionVectors = {
+          'N': [0, 1], 'S': [0, -1], 'E': [1, 0], 'W': [-1, 0],
+          'NE': [0.707, 0.707], 'NW': [-0.707, 0.707],
+          'SE': [0.707, -0.707], 'SW': [-0.707, -0.707]
+      };
+  
+      // Generate random flow data
+      const flowData = x.flatMap(xi => y.map(yi => ({
+          x: xi,
+          y: yi,
+          direction: directions[Math.floor(Math.random() * directions.length)]
+      })));
+  
+      // Create traces for the vector field
+      const traces = flowData.map(point => {
+          const [dx, dy] = directionVectors[point.direction];
+          return {
+              type: 'scatter',
+              mode: 'lines+markers',
+              x: [point.x, point.x + dx],
+              y: [point.y, point.y + dy],
+              line: { color: '#FF6D00', width: 2 },
+              marker: {
+                  symbol: 'arrow',
+                  size: 10,
+                  angle: Math.atan2(dy, dx) * (180 / Math.PI),
+                  angleref: 'previous',
+                  color: '#FF6D00'
+              },
+              hoverinfo: 'text',
+              text: `Position: (${point.x}, ${point.y})<br>Direction: ${point.direction}`
+          };
+      });
+  
+      // Layout configuration
+      const layout = {
+          title: 'People Flow Direction (Cardinal)',
+          xaxis: {
+              title: 'West ← → East',
+              range: [-1, gridSize],
+              tickvals: x,
+              ticktext: x.map(val => val === 0 ? 'W' : val === gridSize - 1 ? 'E' : val.toString())
+          },
+          yaxis: {
+              title: 'South ← → North',
+              range: [-1, gridSize],
+              tickvals: y,
+              ticktext: y.map(val => val === 0 ? 'S' : val === gridSize - 1 ? 'N' : val.toString())
+          },
+          showlegend: false,
+          hovermode: 'closest',
+          margin: { l: 50, r: 50, t: 50, b: 50 },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)'
+      };
+  
+      // Create the plot
+      Plotly.newPlot('flow-vector-field2', traces, layout);
+  }
+  </script>
+
+  
   <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 
