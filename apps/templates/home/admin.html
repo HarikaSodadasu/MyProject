@@ -1,10 +1,21 @@
-
 {% extends "layouts/base.html" %}
 
 {% block title %} Admin Panel {% endblock %}
 
 {% block stylesheets %}
 <style>
+    input[type="checkbox"] {
+        accent-color: #0d6efd;
+        /* Bootstrap primary blue */
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .checkbox-group {
+        margin-bottom: 12px;
+    }
+
     .nav-tabs .nav-link {
         color: #007bff;
         font-weight: bold;
@@ -24,6 +35,38 @@
         border-radius: 5px;
         margin-top: 10px;
     }
+
+    /* Add border to all input fields */
+
+    .form-control {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 8px 12px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    /* Style for form groups to align labels and inputs on same row */
+    .form-group {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group label {
+        width: 180px;
+        margin-bottom: 0;
+        margin-right: 15px;
+        text-align: right;
+    }
+
+    .form-group .form-control {
+        flex: 1;
+    }
 </style>
 {% endblock stylesheets %}
 
@@ -34,90 +77,725 @@
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs" id="adminTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="user-management-tab" data-bs-toggle="tab" href="#user-management" role="tab" aria-controls="user-management" aria-selected="true">User Management</a>
+            <a class="nav-link active" id="user-management-tab" data-bs-toggle="tab" href="#user-management" role="tab"
+                aria-controls="user-management" aria-selected="true">User Management</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="system-configuration-tab" data-bs-toggle="tab" href="#system-configuration" role="tab" aria-controls="system-configuration" aria-selected="false">System Configuration</a>
+            <a class="nav-link" id="system-configuration-tab" data-bs-toggle="tab" href="#system-configuration"
+                role="tab" aria-controls="system-configuration" aria-selected="false">System Configuration</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="log-management-tab" data-bs-toggle="tab" href="#log-management" role="tab" aria-controls="log-management" aria-selected="false">Log Management</a>
+            <a class="nav-link" id="log-management-tab" data-bs-toggle="tab" href="#log-management" role="tab"
+                aria-controls="log-management" aria-selected="false">Log Management</a>
         </li>
     </ul>
 
     <!-- Tabs Content -->
     <div class="tab-content" id="adminTabsContent">
         <!-- User Management Tab -->
-        <div class="tab-pane fade show active" id="user-management" role="tabpanel" aria-labelledby="user-management-tab">
-            <h5>User Management</h5>
-            <p>Manage users, roles, and permissions.</p>
+        <div class="tab-pane fade show active" id="user-management" role="tabpanel"
+            aria-labelledby="user-management-tab">
+            <div class="pt-3">
+
+                <!-- Nested Navigation Tabs for User Management -->
+                <ul class="nav nav-tabs nested-tabs" id="userManagementTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="manage-users-tab" data-bs-toggle="tab"
+                            data-bs-target="#manage-users" type="button" role="tab" aria-controls="manage-users"
+                            aria-selected="true">
+                            Manage Users
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="manage-permissions-tab" data-bs-toggle="tab"
+                            data-bs-target="#manage-permissions" type="button" role="tab"
+                            aria-controls="manage-permissions" aria-selected="false">
+                            Manage Accounts
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="manage-roles-tab" data-bs-toggle="tab"
+                            data-bs-target="#manage-roles" type="button" role="tab" aria-controls="manage-roles"
+                            aria-selected="false">
+                            Manage Permissions
+                        </button>
+                </ul>
+
+
+
+
+                <!-- Nested Tab Content for User Management -->
+                <div class="tab-content" id="userManagementTabContent">
+                    <!-- Manage Users Tab -->
+                    <div class="tab-pane fade show active" id="manage-users" role="tabpanel">
+                        <div class="row">
+                            <!-- Add/Edit User -->
+                            <div class="col-md-5">
+                                <div class="card my-4">
+                                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                            <h6 class="text-white text-capitalize ps-3">Add / Edit User</h6>
+                                        </div>
+                                    </div>
+                                    <div class="card-body px-4 pb-2">
+                                        <form method="POST" action="/add_user">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Username:</label>
+                                                <input type="text" class="form-control" id="username" name="username"
+                                                    placeholder="Enter username">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email:</label>
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    placeholder="Enter email">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">Password:</label>
+                                                <input type="password" class="form-control" id="password" name="password"
+                                                    placeholder="Enter password">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="confirmPassword" class="form-label">Confirm
+                                                    Password:</label>
+                                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                                    placeholder="Re-enter password">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="role" class="form-label">Role:</label>
+                                                <select class="form-select" id="role" name="role">
+                                                    <option selected disabled>Select role</option>
+                                                    <option value="admin">Admin</option>
+                                                    <option value="user">User</option>
+                                                    <option value="viewer">Viewer</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Save User</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Table -->
+                            <div class="col-md-7">
+                                <div class="card my-4">
+                                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                        <div class="bg-gradient-secondary shadow-secondary border-radius-lg pt-4 pb-3">
+                                            <h6 class="text-white text-capitalize ps-3">Manage Existing Users</h6>
+                                        </div>
+                                    </div>
+                                    <div class="card-body px-4 pb-2">
+                                        <div class="mb-3">
+                                            <input type="text" class="form-control" placeholder="Search user..." id="searchInput">
+                                        </div>
+                                        <div style="max-height: 250px; overflow-y: auto;">
+                                            <table class="table align-items-center mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th
+                                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                            Username</th>
+                                                        <th
+                                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                            Email</th>
+                                                        <th
+                                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                            Role</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for user in users %}
+                                                    <tr>
+                                                        <td class="text-sm font-weight-bold">{{ user['username'] }}</td>
+                                                        <td class="text-sm">{{ user['email'] }}</td>
+                                                        <td class="text-sm">{{ user['role'] }}</td>
+                                                        <td>
+                                                            <form method="POST" action="{{ url_for('home_blueprint.delete_user') }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                                                <input type="hidden" name="email" value="{{ user['email'] }}">
+                                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                    {% endfor %}
+                                                </tbody>
+                                                
+                                            </table>
+                                        </div>
+        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage Roles Tab -->
+
+                    <div class="tab-pane fade content-area" id="manage-roles" role="tabpanel"
+                        aria-labelledby="manage-roles-tab">
+
+                        <div class="mt-4">
+                            <h6>Role Management</h6>
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <strong>Role Permissions</strong>
+                                    <select class="form-select form-select-sm me-3"
+                                        style="width: 180px; border-radius: 8px; padding: 6px 12px; border: 1px solid #ccc; background-color: #f8f9fa;">
+                                        <option>Admin</option>
+                                        <option>Super User</option>
+                                        <option>Operator</option>
+                                        <option>User</option>
+                                    </select>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <h6>User & Access Control</h6>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="manageUsers" checked>
+                                            <label for="manageUsers">Manage Users</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="viewUserLogs" checked>
+                                            <label for="viewUserLogs">View User Logs</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="assignRoles" checked>
+                                            <label for="assignRoles">Assign Roles</label>
+                                        </div>
+
+                                        <h6>Detection System Control</h6>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="toggleDetection" checked>
+                                            <label for="toggleDetection">Enable/Disable Detection System</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="viewDetectionLogs" checked>
+                                            <label for="viewDetectionLogs">View Detection Logs</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="configureDetection" checked>
+                                            <label for="configureDetection">Configure Detection Settings</label>
+                                        </div>
+
+                                        <h6>Camera & Feed Settings</h6>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="manageCameras" checked>
+                                            <label for="manageCameras">Add/Remove Cameras</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="accessFeed" checked>
+                                            <label for="accessFeed">Access Live Feed</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="cameraSettings" checked>
+                                            <label for="cameraSettings">Configure Camera Settings</label>
+                                        </div>
+
+                                        <h6>Data & Report Management</h6>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="exportReports" checked>
+                                            <label for="exportReports">Export Detection Reports</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="deleteData" checked>
+                                            <label for="deleteData">Delete Historical Data</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="archiveDetections" checked>
+                                            <label for="archiveDetections">Archive Detections</label>
+                                        </div>
+
+                                        <h6>System Configuration</h6>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="modifyAlerts" checked>
+                                            <label for="modifyAlerts">Modify Alert Settings</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="configureNotifications" checked>
+                                            <label for="configureNotifications">Configure Notification Rules</label>
+                                        </div>
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="restartServices" checked>
+                                            <label for="restartServices">Restart System Services</label>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Save Permissions</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Manage Permissions Tab -->
+                    <div class="tab-pane fade content-area" id="manage-permissions" role="tabpanel"
+                        aria-labelledby="manage-permissions-tab">
+                        <div class="row">
+                            <di class="col-md-12">
+                                <h6>User Permissions</h6>
+
+                                <div class="card my-4">
+                                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                            <h6 class="text-white text-capitalize ps-3">User Management</h6>
+                                        </div>
+                                    </div>
+                                    <div class="card-body px-0 pb-2">
+                                        <div class="table-responsive p-0">
+                                            <div style="max-height: 450px; overflow-y: auto;">
+                                                <table class="table align-items-center mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th
+                                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                Username</th>
+                                                            <th
+                                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                                Email</th>
+                                                            <th
+                                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                                Role</th>
+                                                            <th
+                                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                                                                Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!-- Super User -->
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center">
+                                                                        <h6 class="mb-0 text-sm">superuser</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <p class="text-sm mb-0">superuser@example.com</p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="text-sm mb-0">Super User</p>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <button class="btn btn-sm me-1" title="Edit User"
+                                                                    style="background-color: #3498db; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editUserModal">Edit</button>
+                                                                <button class="btn btn-sm me-1" title="Deactivate User"
+                                                                    style="background-color: #6c757d; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deactivateModal">Deactivate</button>
+                                                                <button class="btn btn-sm" title="Delete User"
+                                                                    style="background-color: #c0392b; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal">Delete</button>
+                                                            </td>
+                                                        </tr>
+                                                        <!-- Admin User -->
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center">
+                                                                        <h6 class="mb-0 text-sm">admin</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <p class="text-sm mb-0">admin@example.com</p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="text-sm mb-0">Admin</p>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <button class="btn btn-sm me-1" title="Edit User"
+                                                                    style="background-color: #3498db; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editUserModal">Edit</button>
+                                                                <button class="btn btn-sm me-1" title="Deactivate User"
+                                                                    style="background-color: #6c757d; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deactivateModal">Deactivate</button>
+                                                                <button class="btn btn-sm" title="Delete User"
+                                                                    style="background-color: #c0392b; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal">Delete</button>
+                                                            </td>
+                                                        </tr>
+                                                        <!-- Operator User -->
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex px-2 py-1">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center">
+                                                                        <h6 class="mb-0 text-sm">operator</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <p class="text-sm mb-0">operator@example.com</p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="text-sm mb-0">Operator</p>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <button class="btn btn-sm me-1" title="Edit User"
+                                                                    style="background-color: #3498db; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editUserModal">Edit</button>
+                                                                <button class="btn btn-sm me-1" title="Deactivate User"
+                                                                    style="background-color: #6c757d; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deactivateModal">Deactivate</button>
+                                                                <button class="btn btn-sm" title="Delete User"
+                                                                    style="background-color: #c0392b; color: white; border-radius: 8px;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal">Delete</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Edit User Modal -->
+                                <div class="modal fade" id="editUserModal" tabindex="-1"
+                                    aria-labelledby="editUserModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form>
+                                                    <div class="mb-3">
+                                                        <label for="username" class="form-label">Username</label>
+                                                        <input type="text" class="form-control" id="username"
+                                                            value="user1" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="email" class="form-label">Email</label>
+                                                        <input type="email" class="form-control" id="email"
+                                                            value="user1@example.com" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="role" class="form-label">Role</label>
+                                                        <select class="form-select" id="role" required>
+                                                            <option value="Admin" selected>Admin</option>
+                                                            <option value="Operator">Operator</option>
+                                                            <option value="User">User</option>
+                                                            <option value="Super User">Super User</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save
+                                                            changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Deactivate User Modal -->
+                                <div class="modal fade" id="deactivateModal" tabindex="-1"
+                                    aria-labelledby="deactivateModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deactivateModalLabel">Deactivate User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to deactivate this user?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <button type="button" class="btn btn-danger"
+                                                    data-bs-dismiss="modal">Deactivate</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete User Modal -->
+                                <div class="modal fade" id="deleteModal" tabindex="-1"
+                                    aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this user? This action cannot be
+                                                    undone.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <button type="button" class="btn btn-danger"
+                                                    data-bs-dismiss="modal">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        </di>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- System Configuration Tab -->
         <div class="tab-pane fade" id="system-configuration" role="tabpanel" aria-labelledby="system-configuration-tab">
-            <h5>System Configuration</h5>
-            <p>Configure system settings and parameters.</p>
+            <div class="pt-3">
+
+                <div class="mb-3">
+                    <button id="email-notifications-btn" class="btn btn-primary config-button active"
+                        onclick="openEmailNotifications()">Email Notifications</button>
+                    <button id="camera-setup-btn" class="btn btn-secondary config-button"
+                        onclick="openCameraSetup()">Camera Setup</button>
+                </div>
+                <div class="col-md-12" id="contentArea">
+                    <!-- Content will be loaded here via JavaScript -->
+                </div>
+            </div>
         </div>
 
         <!-- Log Management Tab -->
         <div class="tab-pane fade" id="log-management" role="tabpanel" aria-labelledby="log-management-tab">
-            <h5>Log Management</h5>
-            <div class="card my-4">
-                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                        <h6 class="text-white text-capitalize ps-3">Log Management</h6>
+            <div class="pt-3">
+
+                <div class="card my-4">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                            <h6 class="text-white text-capitalize ps-3">Log Management</h6>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                <table class="table align-items-center mb-0" id="logTable">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Timestamp</th>
+                                            <th
+                                                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                Sequence</th>
+                                            <th
+                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Message</th>
+                                            <th
+                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Service Name</th>
+                                            <th
+                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Machine Name</th>
+                                            <th
+                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                IP Address</th>
+                                            <th
+                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                User</th>
+                                            <th
+                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                Performance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">2025-04-30 10:12:45</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">1</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">Login
+                                                    successful</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">AuthService</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">srv-auth-01</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">192.168.1.101</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">admin</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">32ms</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">2025-04-30 10:13:07</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">2</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">Data sync
+                                                    completed</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">SyncService</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">srv-sync-02</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">192.168.1.102</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">sync_user</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">120ms</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">2025-04-30 10:14:22</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">3</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">File uploaded:
+                                                    report.pdf</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">FileService</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">srv-file-03</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">192.168.1.103</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">user_john</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">85ms</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">2025-04-30 10:15:55</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">4</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">Error: Database
+                                                    timeout</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">DBService</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">srv-db-01</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">192.168.1.104</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">db_admin</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">3200ms</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">2025-04-30 10:17:30</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">5</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">Scheduled job
+                                                    completed</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">SchedulerService</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">srv-sched-05</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span
+                                                    class="text-secondary text-xs font-weight-bold">192.168.1.105</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">cron_job</span>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">205ms</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="p-3">
+                                <button class="btn btn-success" onclick="showFileTypeSelector()">Download Logs</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body px-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0" id="logTable">
-                            <thead>
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Timestamp</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Sequence</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Message</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Service Name</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Machine Name</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">IP Address</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">User</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Performance</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for log in logs %}
-                                <tr>
-                                    <td>
-                                        <div class="d-flex px-2 py-1">
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">{{ log.timestamp if log else '' }}</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{ log.sequence if log else '' }}</p>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="text-secondary text-xs font-weight-bold">{{ log.message if log else '' }}</span>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="text-secondary text-xs font-weight-bold">{{ log.service_name if log else '' }}</span>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="text-secondary text-xs font-weight-bold">{{ log.machine_name if log else '' }}</span>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="text-secondary text-xs font-weight-bold">{{ log.ip_address if log else '' }}</span>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="text-secondary text-xs font-weight-bold">{{ log.user if log else '' }}</span>
-                                    </td>
-                                    <td class="align-middle text-center text-sm">
-                                        <span class="text-secondary text-xs font-weight-bold">{{ log.performance if log else '' }}</span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Modal for Format Selection -->
+                <!-- File type selector (hidden initially) -->
+                <div id="fileTypeSelector" style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+background-color: white; border: 1px solid #ccc; padding: 20px; z-index: 9999; display: none; border-radius: 8px;">
+                    <label for="fileType">Select file type:</label>
+                    <select id="fileType" class="form-select mb-3">
+                        <option value="pdf">PDF</option>
+                        <option value="csv">CSV (Excel)</option>
+                        <option value="txt">Text File</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="handleFileDownload()">Download</button>
+                    <button class="btn btn-secondary" onclick="closeSelector()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -133,8 +811,28 @@
             tab.addEventListener('click', function () {
                 tabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
+
+                // If System Configuration tab is clicked, show email notifications by default
+                if (this.id === 'system-configuration-tab') {
+                    // Show email notifications content
+                    openEmailNotifications();
+                }
+
             });
         });
+        // Add event listener for System Configuration tab to ensure it shows email notification content when the page loads
+        document.getElementById('system-configuration-tab').addEventListener('shown.bs.tab', function () {
+            openEmailNotifications();
+        });
+
+        // Initialize the content area with email notifications content when page loads
+        // This ensures it's set even before the tab is clicked
+        const contentArea = document.getElementById('contentArea');
+        contentArea.innerHTML = `
+            <h3>Email Notifications Setup</h3>
+            <p>Configure your email notifications settings here. You can set preferences for alerts, frequency, and more.</p>
+        `;
+
 
         function addEmptyRows(numRows) {
             var table = document.getElementById("logTable");
@@ -152,5 +850,416 @@
         // Call the function to add 5 empty rows
         addEmptyRows(5);
     });
+
+    function openEmailNotifications() {
+
+        // Logic to open email notifications configuration
+        const contentArea = document.getElementById('contentArea');
+        contentArea.innerHTML = getEmailNotificationsContent();
+
+        // Set button states
+        document.getElementById('email-notifications-btn').classList.add('active');
+        document.getElementById('email-notifications-btn').classList.remove('btn-secondary');
+        document.getElementById('email-notifications-btn').classList.add('btn-primary');
+
+        document.getElementById('camera-setup-btn').classList.remove('active');
+        document.getElementById('camera-setup-btn').classList.remove('btn-primary');
+        document.getElementById('camera-setup-btn').classList.add('btn-secondary');
+
+        // Add event listeners for toggle switches
+        setTimeout(() => {
+            const toggles = document.querySelectorAll('.notification-toggle');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', function () {
+                    const notificationType = this.getAttribute('data-type');
+                    console.log(`${notificationType} notifications ${this.checked ? 'enabled' : 'disabled'}`);
+                    // Here you would typically save the setting to your backend
+                });
+            });
+
+            // Add event listener for save button
+            document.getElementById('save-email-settings').addEventListener('click', function () {
+                // Show a success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success mt-3';
+                alertDiv.innerHTML = 'Email notification settings saved successfully!';
+                document.getElementById('email-settings-form').appendChild(alertDiv);
+
+                // Remove the alert after 3 seconds
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            });
+        }, 100);
+    }
+
+    function openCameraSetup() {
+        // Logic to open camera setup configuration
+        const contentArea = document.getElementById('contentArea');
+        contentArea.innerHTML = getCameraSetupContent();
+
+        // Set button states
+        document.getElementById('camera-setup-btn').classList.add('active');
+        document.getElementById('camera-setup-btn').classList.remove('btn-secondary');
+        document.getElementById('camera-setup-btn').classList.add('btn-primary');
+
+        document.getElementById('email-notifications-btn').classList.remove('active');
+        document.getElementById('email-notifications-btn').classList.remove('btn-primary');
+        document.getElementById('email-notifications-btn').classList.add('btn-secondary');
+        // Add event listener for save button
+        setTimeout(() => {
+            document.getElementById('save-camera-btn').addEventListener('click', function () {
+                // Show a success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success mt-3';
+                alertDiv.innerHTML = 'Camera settings saved successfully!';
+                document.getElementById('camera-setup-form').appendChild(alertDiv);
+
+                // Remove the alert after 3 seconds
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            });
+        }, 100);
+    }
+
+    function getCameraSetupContent() {
+        return `
+            <div class="card">
+                <div class="card-body">
+                    <div style="max-width: 700px; margin: 0 auto; background-color: #f5f7f8; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <div style="width: 60px; height: 60px; background-color: #424242; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" viewBox="0 0 16 16">
+                                    <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+                                    <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                                </svg>
+                            </div>
+                            <h3 style="font-size: 24px; color: #333; margin: 0;">Add Camera</h3>
+                        </div>
+                        
+                        <form id="camera-setup-form">
+                            <div class="form-group">
+                                <label for="camera-name">Camera Name</label>
+                                <div style="position: relative; flex: 1;">
+                                    <input type="text" class="form-control" id="camera-name" placeholder="Enter camera name">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="serial-number">Serial Number</label>
+                                <div style="position: relative; flex: 1;">
+                                    <input type="text" class="form-control" id="serial-number" placeholder="Enter serial number">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="model">Model</label>
+                                <div style="position: relative; flex: 1;">
+                                    <input type="text" class="form-control" id="model" placeholder="Enter model">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="model-specific">Model Specific</label>
+                                <div style="position: relative; flex: 1;">
+                                    <input type="text" class="form-control" id="model-specific" placeholder="Enter model specific">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ip-address">IP Address</label>
+                                <div style="position: relative; flex: 1;">
+                                    <input type="text" class="form-control" id="ip-address" placeholder="Enter IP address">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="mac-address">MAC</label>
+                                <div style="position: relative; flex: 1;">
+                                    <input type="text" class="form-control" id="mac-address" placeholder="Enter MAC address">
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-4">
+                                
+                                <div style="flex-grow: 1; text-align: center; display: flex; justify-content: center;">
+                                    <button type="button" id="save-camera-btn" class="btn btn-info text-white" style="border-radius: 25px; padding: 10px 30px; background-color: #5bc0de; margin-right: 10px;">Save</button>
+                                    <button type="button" class="btn btn-light" style="border-radius: 25px; padding: 10px 30px;">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+            <br>
+            <div class="container-fluid py-4">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card my-4">
+                            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                <h6 class="text-white text-capitalize ps-3">Cameras Setup</h6>
+                            </div>
+                        </div>
+                    <div class="card-body px-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0" id="">
+                                
+                        <thead>
+                        <tr>
+                        <th><input type="text" class="form-control border-0 py-1" placeholder="Search Name of Camera" onkeyup="filterTable(0)"></th>
+                        <th><input type="text" class="form-control border-0 py-1" placeholder="Search Description" onkeyup="filterTable(1)"></th>
+                        <th><input type="text" class="form-control border-0 py-1" placeholder="Search Model" onkeyup="filterTable(2)"></th>
+                        <th><input type="text" class="form-control border-0 py-1" placeholder="Search Serial Number" onkeyup="filterTable(3)"></th>
+                        <th><input type="text" class="form-control border-0 py-1" placeholder="Search IP Address" onkeyup="filterTable(4)"></th>
+                        <th><input type="text" class="form-control border-0 py-1" placeholder="Search MAC Address" onkeyup="filterTable(5)"></th>
+                        </tr>
+                        <tr>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name of Camera</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 align-middle text-center">Model</th>
+                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Serial Number</th>
+                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">IP Address</th>
+                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">MAC Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        <td class="fw-bold text-dark align-middle text-cente">Library 1</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">This camera is in Library room 1, 2nd floor</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">Model XYZ</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">SN123456</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">192.168.1.10</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">00:1A:2B:3C:4D:5E</td>
+                        </tr>
+                        <tr>
+                        <td class="fw-bold text-dark align-middle text-cente">Library 2</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">This camera is in Library room 2, 3rd floor</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center"> Model ABC</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">SN654321</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">192.168.1.11</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">00:1A:2B:3C:4D:5F</td>
+                        </tr>
+                        <tr>
+                        <td class="fw-bold text-dark align-middle text-cente">Library 3</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">This camera is in Library room 3, 1st floor</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">Model DEF</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">SN789012</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">192.168.1.12</td>
+                        <td class="text-secondary text-xs font-weight-bold align-middle text-center">00:1A:2B:3C:4D:5G</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Buttons Section -->
+            <div class="mt-4 d-flex gap-3">
+                <button class="btn btn-success text-white px-4 py-2 rounded-pill">Add Camera</button>
+                <button class="btn btn-warning px-4 py-2 rounded-pill">Edit Camera</button>
+                <button class="btn btn-danger text-white px-4 py-2 rounded-pill" onclick="confirmDelete()">Delete Camera</button>
+            </div>
+        </div>
+
+        `;
+    }
+    function getEmailNotificationsContent() {
+        return `
+            <div class="card">
+                <div class="card-header p-3">
+                    <h4 class="mb-0">Server E-MAIL notification settings</h4>
+                </div>
+                <div class="card-body">
+                    <form id="email-settings-form">
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="smtp-server">SMTP Server name</label>
+                                    <input type="text" class="form-control" id="smtp-server" value="iHub mail server">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="smtp-hostname">Host name or IP Address</label>
+                                    <input type="text" class="form-control" id="smtp-hostname" value="exchangesvr.abcbank.com">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="smtp-port">Listen Port</label>
+                                    <input type="number" class="form-control" id="smtp-port" value="25">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="smtp-greeting">SMTP greeting</label>
+                                    <input type="text" class="form-control" id="smtp-greeting" value="Welcome to iHub">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="sender-email">Sender Email</label>
+                                    <input type="email" class="form-control" id="sender-email" value="iHubAdmin@abc.com">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="sender-name">Sender Name</label>
+                                    <input type="text" class="form-control" id="sender-name" value="iHub Administrator">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-secondary me-2">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="save-email-settings">Save Settings</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+    }
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete this camera? This action cannot be undone.")) {
+            // Proceed with deletion
+            alert("Camera deleted.");
+        }
+        function filterTable(colIndex) {
+            let table, tr, td, txtValue;
+            table = document.getElementById("cameraTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Get all search inputs
+            let inputs = document.querySelectorAll("thead input");
+
+            // Loop through all table rows (excluding header rows)
+            for (let i = 2; i < tr.length; i++) {
+                let match = true; // Assume row is visible unless a column filter fails
+
+                td = tr[i].getElementsByTagName("td")[colIndex];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    let filter = inputs[colIndex].value.toLowerCase();
+                    if (!txtValue.toLowerCase().includes(filter)) {
+                        match = false;
+                    }
+                }
+
+                // Show or hide row based on filter match
+                tr[i].style.display = match ? "" : "none";
+            }
+        }
+        // Attach event listeners to all input fields
+        document.addEventListener("DOMContentLoaded", function () {
+            let inputs = document.querySelectorAll("thead input");
+            inputs.forEach(input => {
+                input.addEventListener("keyup", function () {
+                    let index = Array.from(inputs).indexOf(input);
+                    filterTable(index);
+                });
+            });
+        });
+    }
+
 </script>
+<!-- Include jsPDF & AutoTable -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+    function showFileTypeSelector() {
+        document.getElementById("fileTypeSelector").style.display = "block";
+    }
+
+    function closeSelector() {
+        document.getElementById("fileTypeSelector").style.display = "none";
+    }
+
+    function handleFileDownload() {
+        const format = document.getElementById("fileType").value;
+        downloadLogTable(format);
+        closeSelector();
+    }
+
+    function downloadLogTable(format) {
+        const table = document.getElementById("logTable");
+
+        // Extract data
+        const headers = Array.from(table.querySelectorAll("thead th")).map(th => th.textContent.trim());
+        const rows = Array.from(table.querySelectorAll("tbody tr")).map(row =>
+            Array.from(row.querySelectorAll("td")).map(td => td.textContent.trim())
+        );
+
+        if (format === 'csv') {
+            let csv = headers.join(",") + "\n";
+            rows.forEach(row => csv += row.join(",") + "\n");
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            triggerDownload(blob, "logs.csv");
+        }
+
+        else if (format === 'txt') {
+            let txt = headers.join(" | ") + "\n" + "-".repeat(80) + "\n";
+            rows.forEach(row => txt += row.join(" | ") + "\n");
+            const blob = new Blob([txt], { type: "text/plain;charset=utf-8;" });
+            triggerDownload(blob, "logs.txt");
+        }
+
+        else if (format === 'pdf') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "A4" });
+            doc.setFontSize(18);
+            doc.text("System Activity Logs", 40, 40);
+
+            doc.autoTable({
+                startY: 60,
+                head: [headers],
+                body: rows,
+                theme: 'striped',
+                styles: { fontSize: 10, cellPadding: 5 },
+                headStyles: {
+                    fillColor: [135, 206, 250],
+                    textColor: 20,
+                    halign: 'center'
+                },
+                columnStyles: {
+                    0: { cellWidth: 90 },
+                    1: { cellWidth: 40 },
+                    2: { cellWidth: 120 },
+                    3: { cellWidth: 100 },
+                    4: { cellWidth: 100 },
+                    5: { cellWidth: 90 },
+                    6: { cellWidth: 80 },
+                    7: { cellWidth: 80 }
+                }
+            });
+
+            doc.save("logs.pdf");
+        }
+    }
+
+    function triggerDownload(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+      var value = this.value.toLowerCase();
+      var rows = document.querySelectorAll("tbody tr");
+      rows.forEach(function (row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(value) ? "" : "none";
+      });
+    });
+  </script>
+  
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock javascripts %}
