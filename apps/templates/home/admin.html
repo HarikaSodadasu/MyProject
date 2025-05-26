@@ -783,23 +783,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="cameras-tbody">
-                                                        {% if cameras %}
-                                                        {% for camera in cameras %}
-                                                        <tr data-camera-id="{{ camera._id }}">
-                                                            <td>{{ camera.name }}</td>
-                                                            <td>{{ camera.model_specific }}</td>
-                                                            <td class="text-center">{{ camera.model }}</td>
-                                                            <td class="text-center">{{ camera.serial_number }}</td>
-                                                            <td class="text-center">{{ camera.ip_address }}</td>
-                                                            <td class="text-center">{{ camera.mac_address }}</td>
-                                                            <td>{{ camera.rtsp_link }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                        {% else %}
-                                                        <tr>
-                                                            <td colspan="7" class="text-center">No cameras found.</td>
-                                                        </tr>
-                                                        {% endif %}
+                                                        <!-- Camera rows will be dynamically inserted here -->
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -1181,8 +1165,8 @@
 
                         row.innerHTML = `
                             <td class="align-middle text-sm"><span class="text-dark text-xs font-weight-bold">${camera.name}</td>
-                            <td class="align-middle text-sm"><span class="text-secondary text-xs font-weight-bold">${camera.model}</span></td>
                             <td class="align-middle text-sm"><span class="text-secondary text-xs font-weight-bold">${camera.model_specific}</span></td>
+                            <td class="align-middle text-sm"><span class="text-secondary text-xs font-weight-bold">${camera.model}</span></td>
                             <td class="align-middle text-sm"><span class="text-secondary text-xs font-weight-bold">${camera.serial_number}</span></td>
                             <td class="align-middle text-sm"><span class="text-secondary text-xs font-weight-bold">${camera.ip_address}</span></td>
                             <td class="align-middle text-sm"><span class="text-secondary text-xs font-weight-bold">${camera.mac_address}</span></td>
