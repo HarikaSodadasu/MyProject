@@ -1191,10 +1191,25 @@
 
                         // Make row selectable
                         row.addEventListener('click', function () {
-                            const rows = document.querySelectorAll('#cameras-tbody tr');
-                            rows.forEach(r => r.classList.remove('table-active'));
-                            row.classList.add('table-active');
-                            selectedRow = row; // Set selected row globally
+                            // Prevent selection if any button is active (edit/save/cancel/delete is in action)
+                            const isEditing = !document.getElementById('edit-btn').classList.contains('d-none');
+                            const isSaving = !document.getElementById('save-btn').classList.contains('d-none');
+                            const isCancelling = !document.getElementById('cancel-btn').classList.contains('d-none');
+                            const isDeleteDisabled = document.getElementById('delete-btn').disabled;
+
+                            // Only allow selection if not in edit/save/cancel mode
+                            if (isEditing && !isSaving && !isCancelling && !isDeleteDisabled) {
+                                // Toggle selection
+                                if (selectedRow === row) {
+                                    row.classList.remove('table-active');
+                                    selectedRow = null;
+                                } else {
+                                    const rows = document.querySelectorAll('#cameras-tbody tr');
+                                    rows.forEach(r => r.classList.remove('table-active'));
+                                    row.classList.add('table-active');
+                                    selectedRow = row;
+                                }
+                            }
                         });
 
                         tableBody.appendChild(row);
@@ -1354,9 +1369,6 @@
             if (firstInput) firstInput.focus();
         }
     }
-</script>
-
-<script>
     document.getElementById('cameraSearchInput').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('#cameras-tbody tr');
@@ -1371,6 +1383,6 @@
         });
     });
 
-
 </script>
+
 {% endblock javascripts %}
