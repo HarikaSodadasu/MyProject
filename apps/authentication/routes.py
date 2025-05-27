@@ -40,7 +40,16 @@ def add_camera():
             'mac_address': data.get('mac_address'),
             'rtsp_link': data.get('rtsp_link')
         }
-        camera_collection.insert_one(camera_data)
+        result = camera_collection.insert_one(camera_data)
+
+        # Update user_action log
+        log_id = session.get('log_id')
+        if log_id:
+            login_logs_collection.update_one(
+                {"_id": ObjectId(log_id)},
+                {"$push": {"user_action": f"Added {camera_data['name']}"}}
+            )
+
         return jsonify({'success': True, 'message': 'Camera added successfully'})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error adding camera: {str(e)}'}), 500
@@ -74,6 +83,14 @@ def update_camera(camera_id):
             {"_id": ObjectId(camera_id)},
             {"$set": update_fields}
         )
+        # Update user_action log
+        log_id = session.get('log_id')
+        if log_id:
+            login_logs_collection.update_one(
+                {"_id": ObjectId(log_id)},
+                {"$push": {"user_action": f"Updated {update_fields['name']}"}}            
+            )
+
         return jsonify({'success': True, 'message': 'Camera updated successfully'})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error updating camera: {str(e)}'}), 500
@@ -82,8 +99,17 @@ def update_camera(camera_id):
 @blueprint.route('/delete-camera/<camera_id>', methods=['DELETE'])
 def delete_camera(camera_id):
     try:
+        camera = camera_collection.find_one({'_id': ObjectId(camera_id)})
         result = camera_collection.delete_one({'_id': ObjectId(camera_id)})
+
         if result.deleted_count == 1:
+            # Update user_action log
+            log_id = session.get('log_id')
+            if log_id and camera:
+                login_logs_collection.update_one(
+                    {"_id": ObjectId(log_id)},
+                    {"$push": {"user_action": f"Deleted {camera.get('name', 'Unknown')}"}}
+                )
             return jsonify({'success': True, 'message': 'Camera deleted'})
         else:
             return jsonify({'success': False, 'message': 'Camera not found'}), 404
@@ -159,7 +185,7 @@ def login():
             "login_time": login_time,
             "ip_address": ip,
             "machine_name": machine_name,
-            "service_name": "Authentication",
+            "user_action": [],  # Initialize once here
             "logout_time": None,
             "performance": "Normal"
         }
@@ -175,7 +201,12 @@ def login():
             session['login_time'] = login_time.isoformat()
             session['last_active'] = login_time.isoformat()
 
-            # Redirect to home/dashboard after login
+            # REMOVE this block - it duplicates "Viewing"
+            # login_logs_collection.update_one(
+            #     {"_id": inserted_log.inserted_id},
+            #     {"$push": {"user_action": "Viewing"}}
+            # )
+
             return redirect(url_for('home_blueprint.index'))
         else:
             log_data["message"] = "Login Failed"
@@ -266,7 +297,7 @@ def logs():
             "logout_time": log.get("logout_time"),
             "sequence": log.get("sequence", ""),
             "message": log.get("message", ""),
-            "service_name": log.get("service_name", ""),
+            "user_action": ", ".join(log["user_action"]) if log.get("user_action") else "No action taken",
             "machine_name": log.get("machine_name", ""),
             "ip_address": log.get("ip_address", ""),
             "user": log.get("username", ""),

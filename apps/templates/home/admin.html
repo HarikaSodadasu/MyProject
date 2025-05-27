@@ -891,7 +891,7 @@
                                                 Message</th>
                                             <th
                                                 class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Service Name</th>
+                                                User Action</th>
                                             <th
                                                 class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Machine Name</th>
@@ -928,9 +928,27 @@
                                                     log.get('message', 'User login event') }}</span>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-secondary text-xs font-weight-bold">{{
-                                                    log.get('service_name', 'Authentication') }}</span>
+                                                {% set actions = log.get('user_action', []) %}
+                                                {% if actions %}
+                                                <div class="text-secondary text-xs font-weight-bold">
+                                                    <a href="javascript:void(0);"
+                                                        class="action-toggle text-decoration-underline"
+                                                        onclick="toggleActions(this)">
+                                                        {{ actions[-1] }}
+                                                    </a>
+                                                    <div
+                                                        class="action-history bg-primary text-white p-2 mt-1 rounded d-none">
+                                                        {% for action in actions %}
+                                                        {{ action }}{% if not loop.last %},{% endif %}<br>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                {% else %}
+                                                <span class="text-muted text-xs fst-italic">No actions taken yet</span>
+                                                {% endif %}
                                             </td>
+
+
                                             <td class="align-middle text-center text-sm">
                                                 <span class="text-secondary text-xs font-weight-bold">{{
                                                     log.get('machine_name', 'Server-01') }}</span>
@@ -1367,6 +1385,13 @@
         });
     });
 
+</script>
+
+<script>
+    function toggleActions(el) {
+        const details = el.nextElementSibling;
+        details.classList.toggle('d-none');
+    }
 </script>
 
 {% endblock javascripts %}
