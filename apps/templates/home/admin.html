@@ -4,6 +4,39 @@
 
 {% block stylesheets %}
 <style>
+    .blue-tooltip .tooltip-inner {
+        background-color: #007bff !important;
+        /* Bootstrap blue */
+        color: white !important;
+        font-size: 0.75rem;
+        white-space: pre-line;
+        padding: 6px 10px;
+        border-radius: 0.375rem;
+        text-align: left;
+    }
+
+    .blue-tooltip.bs-tooltip-top .tooltip-arrow::before,
+    .blue-tooltip.bs-tooltip-auto[x-placement^=top] .tooltip-arrow::before {
+        border-top-color: #007bff !important;
+    }
+
+    /* Add other arrow directions if needed */
+    .blue-tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: #007bff !important;
+    }
+
+    #camera-preview {
+        list-style: none;
+        /* remove bullets */
+        padding-left: 0;
+        margin: 0;
+        max-height: 250px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        border-radius: 0.4rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
     #camera-preview {
         list-style: none;
         /* remove bullets */
@@ -906,15 +939,16 @@
                                                 Performance</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="cameras-tbody">
                                         {% for log in login_logs %}
-                                        <tr>
+                                        {% set actions = log.get('user_action', []) %}
+                                        {% set tooltip_text = actions | map('string') | join(', ') %}
+                                        <tr data-search="{{ tooltip_text | lower }}">
                                             <td>
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center">
                                                         <h6 class="mb-0 text-sm">
-                                                            {{ log['login_time'].strftime('%Y-%m-%d
-                                                            %I:%M:%S %p') if
+                                                            {{ log['login_time'].strftime('%Y-%m-%d %I:%M:%S %p') if
                                                             log.get('login_time') else '' }}
                                                         </h6>
                                                     </div>
@@ -924,50 +958,50 @@
                                                 <p class="text-xs font-weight-bold mb-0">{{ loop.index }}</p>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-secondary text-xs font-weight-bold">{{
-                                                    log.get('message', 'User login event') }}</span>
+                                                <span class="text-secondary text-xs font-weight-bold">
+                                                    {{ log.get('message', 'User login event') }}
+                                                </span>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                {% set actions = log.get('user_action', []) %}
                                                 {% if actions %}
-                                                <div class="text-secondary text-xs font-weight-bold">
-                                                    <a href="javascript:void(0);"
-                                                        class="action-toggle text-decoration-underline"
-                                                        onclick="toggleActions(this)">
-                                                        {{ actions[-1] }}
-                                                    </a>
-                                                    <div
-                                                        class="action-history bg-primary text-white p-2 mt-1 rounded d-none">
-                                                        {% for action in actions %}
-                                                        {{ action }}{% if not loop.last %},{% endif %}<br>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
+                                                <span class="text-secondary text-xs font-weight-bold custom-tooltip"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="{{ tooltip_text }}">
+                                                    {{ actions[-1] }}
+                                                </span>
+                                                <!-- Hidden span for search -->
+                                                <span class="d-none tooltip-search">{{ tooltip_text }}</span>
                                                 {% else %}
-                                                <span class="text-muted text-xs fst-italic">No actions taken yet</span>
+                                                <span class="text-secondary text-xs font-weight-bold">No actions taken
+                                                    yet</span>
                                                 {% endif %}
                                             </td>
 
-
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-secondary text-xs font-weight-bold">{{
-                                                    log.get('machine_name', 'Server-01') }}</span>
+                                                <span class="text-secondary text-xs font-weight-bold">
+                                                    {{ log.get('machine_name', 'Server-01') }}
+                                                </span>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-secondary text-xs font-weight-bold">{{
-                                                    log.get('ip_address', '') }}</span>
+                                                <span class="text-secondary text-xs font-weight-bold">
+                                                    {{ log.get('ip_address', '') }}
+                                                </span>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-secondary text-xs font-weight-bold">{{
-                                                    log.get('username', '') }}</span>
+                                                <span class="text-secondary text-xs font-weight-bold">
+                                                    {{ log.get('username', '') }}
+                                                </span>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-secondary text-xs font-weight-bold">{{
-                                                    log.get('performance', 'Normal') }}</span>
+                                                <span class="text-secondary text-xs font-weight-bold">
+                                                    {{ log.get('performance', 'Normal') }}
+                                                </span>
                                             </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
+
+
                                 </table>
                             </div>
                             <div class="p-3">
@@ -1371,27 +1405,41 @@
             if (firstInput) firstInput.focus();
         }
     }
+
+
+
+
+
+</script>
+<script>
     document.getElementById('cameraSearchInput').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('#cameras-tbody tr');
 
         rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(filter)) {
-                row.style.display = '';  // Show matching row
+            const visibleText = row.textContent.toLowerCase();
+            const tooltipSpan = row.querySelector('.tooltip-search');
+            const tooltipText = tooltipSpan ? tooltipSpan.textContent.toLowerCase() : '';
+
+            if (visibleText.includes(filter) || tooltipText.includes(filter)) {
+                row.style.display = '';
             } else {
-                row.style.display = 'none';  // Hide non-matching row
+                row.style.display = 'none';
             }
         });
     });
-
 </script>
+
 
 <script>
-    function toggleActions(el) {
-        const details = el.nextElementSibling;
-        details.classList.toggle('d-none');
-    }
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (el) {
+        new bootstrap.Tooltip(el, {
+            customClass: 'blue-tooltip'  // Keeps your blue style
+        });
+    });
 </script>
+
+
 
 {% endblock javascripts %}
