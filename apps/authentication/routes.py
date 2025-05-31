@@ -115,6 +115,17 @@ def delete_camera(camera_id):
             return jsonify({'success': False, 'message': 'Camera not found'}), 404
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error deleting camera: {str(e)}'}), 500
+@blueprint.route('/cameras')
+def cameras():
+    try:
+        cameras = list(camera_collection.find())
+        print(f"Found {len(cameras)} cameras.")
+        for cam in cameras:
+            print(cam)
+    except Exception as e:
+        print("Error fetching cameras:", e)
+        cameras = []
+    return render_template('home/cameras', cameras=cameras)
 
 
 # -------------- Session Timeout Handling --------------
