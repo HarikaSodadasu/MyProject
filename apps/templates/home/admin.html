@@ -672,7 +672,7 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="smtp-port">Listen Port</label>
-                                                <input type="number" class="form-control" id="smtp-port" value="25">
+                                                <input type="number" class="form-control" id="smtp-port" value="587">
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -687,6 +687,13 @@
                                                 <label for="sender-email">Sender Email</label>
                                                 <input type="email" class="form-control" id="sender-email"
                                                     value="iHubAdmin@abc.com">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="smtp-password">SMTP Password</label>
+                                                <input type="password" id="smtp-password" name="smtp-password"
+                                                    placeholder="Enter app password" />
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -1440,6 +1447,46 @@
     });
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch('/get-smtp-settings')
+            .then(res => res.json())
+            .then(data => {
+                if (data) {
+                    document.getElementById("smtp-server").value = data.smtp_server || "";
+                    document.getElementById("smtp-hostname").value = data.smtp_hostname || "";
+                    document.getElementById("smtp-port").value = data.smtp_port || "";
+                    document.getElementById("smtp-greeting").value = data.smtp_greeting || "";
+                    document.getElementById("sender-email").value = data.sender_email || "";
+                    document.getElementById("sender-name").value = data.sender_name || "";
+                    document.getElementById("smtp-password").value = data.smtp_password || "";
+                }
+            });
+    });
+</script>
+<script>
+    document.getElementById("save-email-settings").addEventListener("click", () => {
+        const smtpSettings = {
+            smtp_server: document.getElementById("smtp-server").value,
+            smtp_hostname: document.getElementById("smtp-hostname").value,
+            smtp_port: document.getElementById("smtp-port").value,
+            smtp_greeting: document.getElementById("smtp-greeting").value,
+            sender_email: document.getElementById("sender-email").value,
+            sender_name: document.getElementById("sender-name").value,
+            smtp_password: document.getElementById("smtp-password").value
+        };
+
+        fetch('/save-smtp-settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(smtpSettings)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Replace with toast if needed
+            });
+    });
+</script>
 
 
 {% endblock javascripts %}

@@ -24,6 +24,91 @@ db_mongo = client['virtual_Presenz']
 # Collections
 login_logs_collection = db_mongo['login_logs']
 camera_collection = db_mongo['cameras']
+smtp_collection = db_mongo['smtp_settings']
+
+# -------------- SMTP Settings API Routes --------------
+import smtplib
+from email.message import EmailMessage
+
+@blueprint.route('/send-email-alert', methods=['POST'])
+def send_email_alert():
+    try:
+        data = request.get_json()
+        message = data.get('message', 'Alert Notification')
+
+        # Get SMTP settings
+        smtp_config = smtp_collection.find_one()
+        if not smtp_config:
+            return jsonify({'success': False, 'message': 'SMTP settings not found'}), 400
+
+        # Compose email
+        email = EmailMessage()
+        email['Subject'] = smtp_config.get('smtp_greeting', 'System Alert')
+        email['From'] = smtp_config.get('sender_email')
+        email['To'] = smtp_config.get('sender_email')  # or any target address
+        email.set_content(message)
+
+        # Connect and login
+        with smtplib.SMTP(smtp_config['smtp_server'], int(smtp_config['smtp_port'])) as smtp:
+
+            smtp.starttls()  # use TLS for Gmail and most SMTP servers
+            smtp.login(smtp_config['sender_email'], smtp_config['smtp_password'])  # LOGIN here
+            smtp.send_message(email)
+
+        return jsonify({'success': True, 'message': 'Email sent successfully'})
+
+    except Exception as e:
+        print("SMTP ERROR:", str(e))
+        return jsonify({'success': False, 'message': f'Error sending email: {str(e)}'}), 500
+@blueprint.route('/test-smtp')
+def test_smtp():
+    smtp_config = smtp_collection.find_one()
+    try:
+        email = EmailMessage()
+        email['Subject'] = 'SMTP Test'
+        email['From'] = smtp_config['sender_email']
+        email['To'] = smtp_config['sender_email']
+        email.set_content('This is a test email sent from Flask app.')
+
+        with smtplib.SMTP(smtp_config['smtp_server'], int(smtp_config['smtp_port'])) as smtp:
+            smtp.starttls()
+            smtp.login(smtp_config['sender_email'], smtp_config['smtp_password'])
+            smtp.send_message(email)
+
+        return 'Test Email Sent!'
+    except Exception as e:
+        return f'SMTP ERROR: {e}'
+
+
+@blueprint.route('/get-smtp-settings', methods=['GET'])
+def get_smtp_settings_route():
+    try:
+        settings = smtp_collection.find_one({}, {'_id': 0}) or {}
+        return jsonify(settings)
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error fetching SMTP settings: {str(e)}'}), 500
+
+
+@blueprint.route('/save-smtp-settings', methods=['POST'])
+def save_smtp_settings_route():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Invalid input'}), 400
+
+        smtp_collection.update_one({}, {'$set': data}, upsert=True)
+
+        # Optional: Add to user log
+        log_id = session.get('log_id')
+        if log_id:
+            login_logs_collection.update_one(
+                {"_id": ObjectId(log_id)},
+                {"$push": {"user_action": "Updated SMTP settings"}}
+            )
+
+        return jsonify({'success': True, 'message': 'SMTP settings saved successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error saving SMTP settings: {str(e)}'}), 500
 
 # -------------- Camera Setup API Routes --------------
 
