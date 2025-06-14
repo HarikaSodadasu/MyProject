@@ -698,6 +698,13 @@
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
+                                                <label for="recipient-email">Recipient Email</label>
+                                                <input type="email" class="form-control" id="recipient-email"
+                                                    value="iHubAdmin@abc.com">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
                                                 <label for="sender-name">Sender Name</label>
                                                 <input type="text" class="form-control" id="sender-name"
                                                     value="iHub Administrator">
@@ -1460,6 +1467,7 @@
                     document.getElementById("sender-email").value = data.sender_email || "";
                     document.getElementById("sender-name").value = data.sender_name || "";
                     document.getElementById("smtp-password").value = data.smtp_password || "";
+                    document.getElementById("recipient-email").value = data.recipeint_email || "";
                 }
             });
     });
@@ -1473,7 +1481,8 @@
             smtp_greeting: document.getElementById("smtp-greeting").value,
             sender_email: document.getElementById("sender-email").value,
             sender_name: document.getElementById("sender-name").value,
-            smtp_password: document.getElementById("smtp-password").value
+            smtp_password: document.getElementById("smtp-password").value,
+            recipient_email: document.getElementById("recipient-email").value
         };
 
         fetch('/save-smtp-settings', {
